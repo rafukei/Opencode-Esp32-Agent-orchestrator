@@ -198,15 +198,17 @@ install_readme() {
   [[ -f "$readme" ]] && [[ "$FORCE" -ne 1 ]] && { echo "Skipping README.md — already exists (use --force to overwrite)"; return 0; }
   echo "Creating $readme"
   cat > "$readme" <<'READEOF'
-# ESP32 Project — OpenCode Agents Installed
+# ESP32 Project — OpenCode AI Agents Ready
 
 This project has **OpenCode AI agents** installed by [Esp32Agent](https://github.com/anomalyco/Esp32Agent).
 
 ## What was installed?
 
-- `.opencode/` — AI agents (architect, implements, verify, reviewer, debugger, documenter)
-- `.agents/` — ESP32 skill pack
-- `.espagent/` — helper scripts
+```
+.opencode/    → AI agents (architect, implements, verify, reviewer, debugger, documenter)
+.agents/      → ESP32 skill pack
+.espagent/    → Helper scripts (check.sh, build.sh, run-opencode.sh)
+```
 
 All agent files are **hidden** (dotfiles). Run `ls -la` to see them.
 
