@@ -50,18 +50,9 @@ You have direct access to six specialised agents. You communicate with them by i
 - Dont fix code, don't change the code, 
 don't fix the process./
 
-Use this loop, any failure from gates goes back to implements:
-
-```
-                                    [orchestra-leader]
-                              (delegates & enforces gates)
-                   __________________|____|____|____|____|____|________________
-                   ↓                  ↓    ↓    ↓    ↓    ↓                  ↓
-start → [architect] → [implements] → [verify] → [reviewer] → [debugger] → [documenter] → end
-                                     ↑         |            |             |
-                                     |_________|____________|_____________|
-                                     (failure loops back to implements)
-```
+Use this loop, any failure caming back, other agent
+stat->[architect]->[implements]->is ok->[verify]-->is ok->[reviewer]->is ok-> [debugger]->is ok->[documenter]->end
+                   ^______________|________ ________|___________________|__________________|
                     
 
 ## The Mandatory Workflow

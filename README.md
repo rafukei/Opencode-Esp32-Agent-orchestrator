@@ -13,27 +13,23 @@ This copies `.opencode/` (agents) and `.agents/` (ESP32 skill) into the target p
 
 ## Agent pipeline
 
-The `orchestra-leader` agent coordinates every step. It delegates tasks, waits for results, and enforces quality gates in a strict pipeline:
+The `orchestra-leader` agent drives a strict sequential pipeline with quality gates:
 
 ```
-                                    [orchestra-leader]
-                              (delegates & enforces gates)
-                   __________________|____|____|____|____|____|________________
-                   ↓                  ↓    ↓    ↓    ↓    ↓                  ↓
 start → [architect] → [implements] → [verify] → [reviewer] → [debugger] → [documenter] → end
-                                     ↑         |            |             |
-                                     |_________|____________|_____________|
-                                     (failure loops back to implements)
+           ^               |              |           |             |
+           |_______________|______________|___________|_____________|
+                       (loop back on failure)
 ```
 
 1. **Architect** — receives user request, produces system plan + `todo.md`
 2. **Implements** — writes C code, headers, CMake for each task
-3. **Verify** — fresh-eyes review, scenario testing; 🔴 critical bugs send back to implements
-4. **Reviewer** — checks architecture, code quality, feature completeness; failures send back to implements
-5. **Debugger** — builds, flashes, runs on hardware; runtime failures send back to implements
+3. **Verify** — fresh-eyes review, scenario testing; 🔴 critical bugs send it back to implements
+4. **Reviewer** — checks architecture, code quality, feature completeness
+5. **Debugger** — builds, flashes, runs on hardware; runtime failures loop back
 6. **Documenter** — updates README, API docs, changelog
 
-Each gate must pass before the next opens. Any failure loops back to **implements** to fix and re-enter from **verify** (to catch regressions).
+Each gate must pass before the next opens. Any failure loops back to **implements** and re-enters from **verify** (to catch regressions).
 
 ## Agents
 
