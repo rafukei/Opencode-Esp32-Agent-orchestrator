@@ -23,6 +23,7 @@ permission:
     verify: allow
     reviewer: allow
     documenter: allow
+    architect: allow
     
 ---
 

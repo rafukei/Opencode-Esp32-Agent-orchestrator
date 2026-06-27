@@ -6,25 +6,19 @@ usage() {
 Esp32Agent installer — install agent orchestra + ESP32 skill into any ESP-IDF project.
 
 Usage:
-  ./install.sh <esp32-project-dir> [options]
-
-One-command:
-  ./install.sh /path/to/esp32-project --force
+  ./install.sh <esp32-project-dir>
 
 Options:
-  --copy            Copy .opencode and .agents into the target. Default.
-  --symlink         Symlink instead (shared updates, but OpenCode may reject external reads).
   --force           Replace existing .opencode/.agents after timestamped backup.
-  --dry-run         Print actions without changing anything.
-  --model MODEL     Set OpenCode model in all agent files. Default: auto-detect.
+  --model MODEL     Set model directly (skips interactive pick).
   --no-model-patch  Keep shipped model lines.
-  --check           Run post-install checks (default).
-  --no-check        Skip post-install checks.
+  --symlink         Symlink instead of copy.
+  --dry-run         Print actions without changing anything.
   -h,--help         Show this help.
 
 Examples:
+  ./install.sh ./my-project
   ./install.sh /path/to/esp32-project --force
-  ./install.sh /path/to/esp32-project --symlink --no-model-patch
 USAGE
 }
 
@@ -105,14 +99,28 @@ choose_model() {
   local oc="$1"
   local avail
   avail="$(cd "$TARGET" && bash -lc "$oc models 2>/dev/null" || true)"
-  for m in \
-    deepseek-v4-flash-free\
-    opencode/big-pickle \
-    opencode/north-mini-code-free \
-    opencode/mimo-v2.5-free \
-    opencode/nemotron-3-ultra-free
-  do grep -Fxq "$m" <<<"$avail" && { echo "$m"; return 0; }; done
-  return 1
+  [[ -z "$avail" ]] && return 1
+
+  readarray -t all <<<"$avail"
+  local models=()
+  for m in "${all[@]}"; do
+    [[ "$m" == *free* || "$m" == *Free* ]] && models+=("$m")
+  done
+  [[ ${#models[@]} -eq 0 ]] && { echo "No free models found." >&2; return 1; }
+  [[ ${#models[@]} -eq 1 ]] && { echo "${models[0]}"; return 0; }
+
+  echo "Select a free OpenCode model:" >&2
+  for i in "${!models[@]}"; do
+    printf "  %2d) %s\n" $((i+1)) "${models[$i]}" >&2
+  done
+
+  local choice
+  while :; do
+    read -p "Model [1-${#models[@]}]: " choice >&2
+    [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#models[@]} )) && break
+    echo "Invalid." >&2
+  done
+  echo "${models[$((choice-1))]}"
 }
 
 patch_agent_models() {
@@ -183,6 +191,57 @@ SHEOF
 
 install_one ".opencode"
 install_one ".agents"
+
+install_readme() {
+  local dir="$TARGET"
+  local readme="$dir/README.md"
+  [[ -f "$readme" ]] && [[ "$FORCE" -ne 1 ]] && { echo "Skipping README.md — already exists (use --force to overwrite)"; return 0; }
+  echo "Creating $readme"
+  cat > "$readme" <<'READEOF'
+# ESP32 Project — OpenCode Agents Installed
+
+This project has **OpenCode AI agents** installed by [Esp32Agent](https://github.com/anomalyco/Esp32Agent).
+
+## What was installed?
+
+- `.opencode/` — AI agents (architect, implements, verify, reviewer, debugger, documenter)
+- `.agents/` — ESP32 skill pack
+- `.espagent/` — helper scripts
+
+All agent files are **hidden** (dotfiles). Run `ls -la` to see them.
+
+## How to start
+
+```bash
+# Open OpenCode in this project
+opencode
+
+# Or use the helper script
+.espagent/run-opencode.sh
+```
+
+Then inside OpenCode, ask the agent:
+
+```
+Use orchestra-leader. I want to build a FreeRTOS project with 3 tasks. Build it but do not flash.
+```
+
+## Quick commands
+
+| Command | What it does |
+|---|---|
+| `.espagent/check.sh` | Check installation |
+| `.espagent/build.sh build` | Build with idf.py |
+| `.espagent/build.sh flash` | Flash to board |
+| `opencode` | Start OpenCode |
+
+## Need help?
+
+See the [Esp32Agent README](.opencode/README.md) for full documentation.
+READEOF
+}
+
+install_readme
 
 if [[ "$PATCH_MODEL" -eq 1 ]]; then
   if [[ "$MODEL" == "auto" ]]; then

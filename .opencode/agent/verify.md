@@ -8,15 +8,12 @@ tools:
   glob: true
   grep: true
   bash: true
-  write: true
-  edit: true
 permission:
   read: allow
   list: allow
   glob: allow
   grep: allow
   bash: allow
-  edit: allow
 ---
 
 # ESP32 Program Verification Agent

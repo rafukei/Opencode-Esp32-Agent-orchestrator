@@ -1,60 +1,137 @@
-# Esp32Agent — Agent orchestrator ESP32 FreeRTOS project generator
+# Esp32Agent — IA agentes para programação ESP32 com OpenCode
 
-Reusable OpenCode agent orchestra and ESP32 skill pack for building an **agent-orchestrator** FreeRTOS firmware project — where FreeRTOS tasks are managed as agents with lifecycle, messaging, heartbeat monitoring, and CLI control.
+> 🧠 **Seu assistente de IA para programar ESP32 com FreeRTOS.**  
+> Código, debug e documentação guiados por agentes — direto no terminal.
 
-## Install into any ESP32 project
+---
+
+## ⚠️ Esta pasta não está vazia!
+
+Se você deu `ls` e viu só `install.sh`, `LICENSE` e `README.md`, é porque os arquivos importantes são **ocultos** (começam com `.`).  
+Use `ls -la` para ver tudo:
+
+```
+.agents/          ← Skills ESP32 (conhecimento técnico)
+.opencode/        ← Agentes OpenCode (cérebro do projeto)
+.gitignore
+install.sh
+LICENSE
+README.md
+```
+
+---
+
+## O que é isso?
+
+**Esp32Agent** é um conjunto de **agentes de IA** para o [OpenCode](https://opencode.ai) que ajudam você a criar, revisar, depurar e documentar projetos ESP32 com FreeRTOS. Os agentes conversam entre si para garantir qualidade em cada etapa.
+
+---
+
+## Como usar
+
+### 1. Instale o OpenCode
+
+```bash
+npm install -g opencode-ai
+```
+
+> Ou siga o guia oficial: https://opencode.ai/docs/installation
+
+### 2. Instale o Esp32Agent no seu projeto
 
 ```bash
 cd Esp32Agent
-./install.sh /path/to/your/esp32-project --force
+./install.sh /caminho/do/seu/projeto-esp32
 ```
 
-This copies `.opencode/` (agents) and `.agents/` (ESP32 skill) into the target project.
+Isso copia os agentes (`.opencode/`) e skills (`.agents/`) para dentro do seu projeto.
 
-## Agent pipeline
+### 3. Entre no seu projeto e comece
 
-The `orchestra-leader` agent drives a strict sequential pipeline with quality gates:
-
-```
-stat->[architect]->[implements]->is ok->[verify]-->is ok->[reviewer]->is ok-> [debugger]->is ok->[documenter]->end
-                        ^__________|________ ________|___________________|__________________|
+```bash
+cd /caminho/do/seu/projeto-esp32
+opencode
 ```
 
-1. **Architect** — receives user request, produces system plan + `todo.md`
-2. **Implements** — writes C code, headers, CMake for each task
-3. **Verify** — fresh-eyes review, scenario testing; 🔴 critical bugs send it back to implements
-4. **Reviewer** — checks architecture, code quality, feature completeness
-5. **Debugger** — builds, flashes, runs on hardware; runtime failures loop back
-6. **Documenter** — updates README, API docs, changelog
-
-Each gate must pass before the next opens. Any failure loops back to **implements** and re-enters from **verify** (to catch regressions).
-
-## Agents
-
-| Agent | Role |
-|---|---|
-| `orchestra-leader` | Primary coordinator — plans and delegates, never writes code directly |
-| `architect` | Research, system design, and planning |
-| `implements` | Writes all C source, headers, CMake, sdkconfig |
-| `verify` | Fresh-eyes code review and scenario testing |
-| `reviewer` | Design quality, code quality, feature completeness |
-| `debugger` | Build, flash, runtime debugging on real hardware |
-| `documenter` | README and portable docs |
-
-## Skill
-
-`.agents/skills/esp32-hobby/` — reusable skill pack with USB programming and documentation references.
-
-## First prompt
+Dentro do OpenCode, use o agente **orchestra-leader**:
 
 ```
 Use orchestra-leader. Build the agent-orchestrator project: generate all files, then build with idf.py build. Do not flash hardware.
 ```
 
-## Safety
+---
 
-Builds and read-only inspection are allowed. Flashing, OTA, erase, and GPIO output require explicit user confirmation and `reviewer` approval.
+## O que cada agente faz?
 
-## License
+| Se você pedir... | O agente que executa |
+|---|---|
+| "Cria um novo projeto" | **Architect** — planeja a estrutura |
+| "Implementa o código" | **Implements** — escreve C, headers, CMake |
+| "Verifica se está certo" | **Verify** — revisão de olhos frescos |
+| "Revisa a qualidade" | **Reviewer** — checa arquitetura e estilo |
+| "Compila e testa" | **Debugger** — build + flash + debug |
+| "Gera documentação" | **Documenter** — README, API docs |
 
-MIT License — see [LICENSE](LICENSE).
+Tudo começa pelo **orchestra-leader**, que coordena os demais em sequência.
+
+---
+
+## Estrutura de arquivos
+
+Depois da instalação, seu projeto ESP32 vai ter pastas ocultas com os agentes:
+
+```
+.projeto-esp32/
+├── .opencode/         ← Agentes OpenCode (cérebro)
+│   └── agent/         ← Configuração de cada agente
+├── .agents/           ← Skills (conhecimento ESP32)
+│   └── skills/esp32-hobby/
+├── .espagent/         ← Scripts auxiliares
+│   ├── check.sh       → Verifica se tudo está pronto
+│   ├── build.sh       → Compila com idf.py
+│   └── run-opencode.sh → Inicia o OpenCode
+├── main/              ← Seu código fonte
+├── CMakeLists.txt
+└── sdkconfig
+```
+
+---
+
+## Comandos úteis
+
+```bash
+# Verificar instalação
+.espagent/check.sh
+
+# Abrir OpenCode
+.espagent/run-opencode.sh
+
+# Compilar manualmente
+.espagent/build.sh build
+
+# Flash na placa
+.espagent/build.sh flash
+```
+
+---
+
+## Primeiros passos com OpenCode
+
+1. Digite `opencode` no terminal dentro do seu projeto
+2. Escreva em linguagem natural o que você quer fazer
+3. Os agentes trabalham em sequência e mostram o progresso
+4. Você revisa e aprova cada etapa
+
+**Exemplo de prompt inicial:**
+
+```
+Use orchestra-leader. I want to create a FreeRTOS project with 3 tasks: 
+one reading a temperature sensor, one blinking an LED, and one sending 
+data via UART. Build it but do not flash.
+```
+
+---
+
+## Licença
+
+MIT — veja [LICENSE](LICENSE).
