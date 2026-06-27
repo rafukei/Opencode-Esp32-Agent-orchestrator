@@ -1,0 +1,13 @@
+build/
+sdkconfig
+sdkconfig.old
+*.elf
+*.bin
+*.hex
+*.map
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
