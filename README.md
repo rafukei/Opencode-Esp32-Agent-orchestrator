@@ -11,6 +11,26 @@ cd Esp32Agent
 
 This copies `.opencode/` (agents) and `.agents/` (ESP32 skill) into the target project.
 
+## Agent pipeline
+
+The `orchestra-leader` agent drives a strict sequential pipeline with quality gates:
+
+```
+start → [architect] → [implements] → [verify] → [reviewer] → [debugger] → [documenter] → end
+           ^               |              |           |             |
+           |_______________|______________|___________|_____________|
+                       (loop back on failure)
+```
+
+1. **Architect** — receives user request, produces system plan + `todo.md`
+2. **Implements** — writes C code, headers, CMake for each task
+3. **Verify** — fresh-eyes review, scenario testing; 🔴 critical bugs send it back to implements
+4. **Reviewer** — checks architecture, code quality, feature completeness
+5. **Debugger** — builds, flashes, runs on hardware; runtime failures loop back
+6. **Documenter** — updates README, API docs, changelog
+
+Each gate must pass before the next opens. Any failure loops back to **implements** and re-enters from **verify** (to catch regressions).
+
 ## Agents
 
 | Agent | Role |
@@ -18,9 +38,9 @@ This copies `.opencode/` (agents) and `.agents/` (ESP32 skill) into the target p
 | `orchestra-leader` | Primary coordinator — plans and delegates, never writes code directly |
 | `architect` | Research, system design, and planning |
 | `implements` | Writes all C source, headers, CMake, sdkconfig |
-| `debugger` | Read-only root-cause analysis |
-| `verify` | Build verification, flash (gated), serial boot check |
-| `reviewer` | Gate for flash/OTA/GPIO output |
+| `verify` | Fresh-eyes code review and scenario testing |
+| `reviewer` | Design quality, code quality, feature completeness |
+| `debugger` | Build, flash, runtime debugging on real hardware |
 | `documenter` | README and portable docs |
 
 ## Skill
