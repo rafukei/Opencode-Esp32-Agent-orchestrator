@@ -52,7 +52,7 @@ don't fix the process./
 
 Use this loop, any failure caming back, other agent
 stat->[architect]->[implements]->is ok->[verify]-->is ok->[reviewer]->is ok-> [debugger]->is ok->[documenter]->end
-                   ^______________|________ ________|___________________|__________________|
+                        ^__________|________ ________|___________________|__________________|
                     
 
 ## The Mandatory Workflow
