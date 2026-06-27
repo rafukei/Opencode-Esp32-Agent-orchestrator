@@ -61,6 +61,24 @@ Use orchestra-leader. Build the agent-orchestrator project: generate all files, 
 
 ---
 
+## Agent pipeline
+
+The `orchestra-leader` agent drives a strict sequential pipeline with quality gates:
+
+```
+stat->[architect]->[implements]->is ok->[verify]-->is ok->[reviewer]->is ok-> [debugger]->is ok->[documenter]->end
+                        ^__________|________ ________|___________________|__________________|
+```
+
+1. **Architect** — receives user request, produces system plan + `todo.md`
+2. **Implements** — writes C code, headers, CMake for each task
+3. **Verify** — fresh-eyes review, scenario testing; 🔴 critical bugs send it back to implements
+4. **Reviewer** — checks architecture, code quality, feature completeness
+5. **Debugger** — builds, flashes, runs on hardware; runtime failures loop back
+6. **Documenter** — updates README, API docs, changelog
+
+Each gate must pass before the next opens. Any failure loops back to **implements** and re-enters from **verify** (to catch regressions).
+
 ## What each agent does
 
 | If you ask... | The agent that runs |
