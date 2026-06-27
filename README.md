@@ -36,3 +36,7 @@ Use orchestra-leader. Build the agent-orchestrator project: generate all files, 
 ## Safety
 
 Builds and read-only inspection are allowed. Flashing, OTA, erase, and GPIO output require explicit user confirmation and `reviewer` approval.
+
+## License
+
+MIT License — see [LICENSE](LICENSE).
