@@ -13,13 +13,17 @@ This copies `.opencode/` (agents) and `.agents/` (ESP32 skill) into the target p
 
 ## Agent pipeline
 
-The `orchestra-leader` agent drives a strict sequential pipeline with quality gates:
+The `orchestra-leader` agent coordinates every step. It delegates tasks, waits for results, and enforces quality gates in a strict pipeline:
 
 ```
+                                    [orchestra-leader]
+                              (delegates & enforces gates)
+                   __________________|____|____|____|____|____|________________
+                   ↓                  ↓    ↓    ↓    ↓    ↓                  ↓
 start → [architect] → [implements] → [verify] → [reviewer] → [debugger] → [documenter] → end
-                              ↑         |            |             |
-                              |_________|____________|_____________|
-                              (failure loops back to implements)
+                                     ↑         |            |             |
+                                     |_________|____________|_____________|
+                                     (failure loops back to implements)
 ```
 
 1. **Architect** — receives user request, produces system plan + `todo.md`

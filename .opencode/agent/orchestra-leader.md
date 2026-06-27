@@ -51,9 +51,17 @@ You have direct access to six specialised agents. You communicate with them by i
 don't fix the process./
 
 Use this loop, any failure from gates goes back to implements:
+
+```
+                                    [orchestra-leader]
+                              (delegates & enforces gates)
+                   __________________|____|____|____|____|____|________________
+                   ↓                  ↓    ↓    ↓    ↓    ↓                  ↓
 start → [architect] → [implements] → [verify] → [reviewer] → [debugger] → [documenter] → end
-                              ↑         |            |             |
-                              |_________|____________|_____________|
+                                     ↑         |            |             |
+                                     |_________|____________|_____________|
+                                     (failure loops back to implements)
+```
                     
 
 ## The Mandatory Workflow
