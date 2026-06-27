@@ -17,19 +17,18 @@ The `orchestra-leader` agent drives a strict sequential pipeline with quality ga
 
 ```
 start → [architect] → [implements] → [verify] → [reviewer] → [debugger] → [documenter] → end
-           ^               |              |           |             |
-           |_______________|______________|___________|_____________|
-                       (loop back on failure)
+  ^________________________________________________________________________________________|
+                              (any failure loops back to architect)
 ```
 
 1. **Architect** — receives user request, produces system plan + `todo.md`
 2. **Implements** — writes C code, headers, CMake for each task
-3. **Verify** — fresh-eyes review, scenario testing; 🔴 critical bugs send it back to implements
+3. **Verify** — fresh-eyes review, scenario testing; 🔴 critical bugs fail the gate
 4. **Reviewer** — checks architecture, code quality, feature completeness
-5. **Debugger** — builds, flashes, runs on hardware; runtime failures loop back
+5. **Debugger** — builds, flashes, runs on hardware; runtime failures fail the gate
 6. **Documenter** — updates README, API docs, changelog
 
-Each gate must pass before the next opens. Any failure loops back to **implements** and re-enters from **verify** (to catch regressions).
+Each gate must pass before the next opens. Any failure loops back to **architect** for re-planning before a new implementation attempt.
 
 ## Agents
 
